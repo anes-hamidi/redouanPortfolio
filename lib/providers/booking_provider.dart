@@ -111,9 +111,13 @@ Merci de me recontacter pour la confirmation et le devis.
     final whatsappUrl = Uri.parse('https://wa.me/$cleanPhone?text=${Uri.encodeComponent(textMessage)}');
 
     try {
-      if (await canLaunchUrl(whatsappUrl)) {
-        await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
-      } else {
+      bool launched = false;
+      try {
+        launched = await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+      } catch (_) {
+        launched = false;
+      }
+      if (!launched) {
         await launchUrl(whatsappUrl, mode: LaunchMode.platformDefault);
       }
       state = state.copyWith(status: BookingFormStatus.success);

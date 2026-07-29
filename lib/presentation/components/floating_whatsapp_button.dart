@@ -17,9 +17,13 @@ class FloatingWhatsappButton extends StatelessWidget {
     final url = Uri.parse('https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}');
 
     try {
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
+      bool launched = false;
+      try {
+        launched = await launchUrl(url, mode: LaunchMode.externalApplication);
+      } catch (_) {
+        launched = false;
+      }
+      if (!launched) {
         await launchUrl(url, mode: LaunchMode.platformDefault);
       }
     } catch (e) {
