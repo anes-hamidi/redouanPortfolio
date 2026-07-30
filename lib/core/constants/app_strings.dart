@@ -1,11 +1,11 @@
 /// Centralized text strings for Cheb Redouane Portfolio
 abstract class AppStrings {
   // App Title
-  static const String appTitle = 'Cheb Redouane Tlemcani | Portfolio Officiel';
+  static const String appTitle = 'Orchestre Redouane | Portfolio Officiel';
 
   // Navigation & Branding
-  static const String brandName = 'CHEB REDOUANE';
-  static const String brandSubtitle = 'TLEMCANI HERITAGE';
+  static const String brandName = 'ORCHESTRE REDOUANE';
+  static const String brandSubtitle = 'TLEMCEN HERITAGE';
   static const String brandDrawerSubtitle = 'PATRIMOINE ALGÉRIEN';
   static const String navHome = 'Accueil';
   static const String navAbout = 'À Propos';
@@ -19,18 +19,18 @@ abstract class AppStrings {
   static const String heroTagline = 'HÉRITAGE MUSICAL & HAWZI DE TLEMCEN';
   static const String heroHeadline = 'Vivez la Magie de la Musique Algérienne Authentique';
   static const String heroSubtitle =
-      'Mariages, Anniversaires, Événements Privés & Concerts Publics avec Cheb Redouane Tlemcani. Une musique élégante, festive et 100% respectueuse des traditions familiales.';
+      'Mariages, Anniversaires, Événements Privés & Concerts Publics avec Orchestre Redouane. Une musique élégante, festive et 100% respectueuse des traditions familiales.';
   static const String heroCtaPrimary = 'Réserver Votre Événement';
   static const String heroCtaSecondary = 'Écouter les Démos';
 
   // About Section
   static const String aboutTagline = 'L’Artiste & Son Héritage';
-  static const String artistName = 'Cheb Redouane Tlemcani';
+  static const String artistName = 'Orchestre Redouane';
   static const String aboutSubhead = 'La Voix de la Tradition et du Raffinement';
   static const String aboutBio1 =
-      'Originaire de la magnifique cité de Tlemcen, haut lieu d’art et d’histoire, Cheb Redouane Tlemcani perpétue avec passion le riche héritage du Hawzi et du Chaabi algérien. Fort d’une solide expérience des scènes familiales et des scènes publiques, il a su s’imposer comme une référence incontournable pour animer les plus beaux moments de vie.';
+      'Originaire de la magnifique cité de Tlemcen, haut lieu d’art et d’histoire, Orchestre Redouane perpétue avec passion le riche héritage du Hawzi et du Chaabi algérien. Fort d’une solide expérience des scènes familiales et des scènes publiques, il a su s’imposer comme une référence incontournable pour animer les plus beaux moments de vie.';
   static const String aboutBio2 =
-      'Cheb Redouane propose un répertoire propre, noble et profondément familial. Il sélectionne chaque morceau avec attention pour garantir une ambiance à la fois festive, entraînante et respectueuse de toutes les générations présentes.';
+      'Orchestre Redouane propose un répertoire propre, noble et profondément familial. Il sélectionne chaque morceau avec attention pour garantir une ambiance à la fois festive, entraînante et respectueuse de toutes les générations présentes.';
 
   // Services Section
   static const String servicesTagline = 'Des Prestations Sur Mesure';
@@ -45,7 +45,7 @@ abstract class AppStrings {
       'Aperçu de nos prestations en direct lors des plus prestigieuses cérémonies.';
 
   // Why Choose Section
-  static const String whyChooseTagline = 'Pourquoi Choisir Cheb Redouane ?';
+  static const String whyChooseTagline = 'Pourquoi Choisir Orchestre Redouane ?';
   static const String whyChooseTitle = 'Nos Engagements Qualité';
 
   // Booking & Contact Section
@@ -54,11 +54,11 @@ abstract class AppStrings {
   static const String contactSubtitle =
       'Intéressé par une prestation ? Remplissez le formulaire ci-dessous pour vérifier la disponibilité et recevoir un devis personnalisé sous 24h.';
   static const String contactDirectHeader = 'Coordonnées Directes';
-  static const String contactPhone = '+213 (0) 555 12 34 56';
-  static const String whatsappNumber = '213555123456';
-  static const String whatsappDisplayPhone = '+213 555 12 34 56';
-  static const String contactEmail = 'contact@chebredouane-tlemcani.com';
-  static const String contactLocation = 'Tlemcen / Oran / Alger & International';
+  static const String contactPhone = '+213 (0) 658 46 97 61';
+  static const String whatsappNumber = '213658 46 97 61';
+  static const String whatsappDisplayPhone = '+213 658 46 97 61';
+  static const String contactEmail = 'contact@redouanetlemcani.com';
+  static const String contactLocation = '';
 
   // Form Fields
   static const String labelFullName = 'Nom Complet';
@@ -71,5 +71,5 @@ abstract class AppStrings {
   static const String formSuccessMessage = 'Demande envoyée avec succès ! Nous vous recontacterons très rapidement.';
 
   // Footer
-  static const String footerCopyright = 'Cheb Redouane Tlemcani. Tous droits réservés.';
+  static const String footerCopyright = 'Orchestre Redouane. Tous droits réservés.';
 }

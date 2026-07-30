@@ -330,10 +330,12 @@ class AudioPlayerWidget extends ConsumerWidget {
                         final originalIndex = audioState.tracks.indexOf(track);
                         final isCurrent = originalIndex == audioState.activeTrackIndex;
 
-                        return ListTile(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                          dense: true,
+                        return Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                            dense: true,
                           leading: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
@@ -375,8 +377,9 @@ class AudioPlayerWidget extends ConsumerWidget {
                             style: const TextStyle(color: Colors.white54, fontSize: 12),
                           ),
                           onTap: () => audioNotifier.selectTrack(originalIndex),
-                        );
-                      },
+                        ),
+                      );
+                    },
                     ),
             ],
           ),

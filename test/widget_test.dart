@@ -6,14 +6,15 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:portfolio/app.dart';
 
 void main() {
   testWidgets('Portfolio loads smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget( RedouanePortfolioApp());
+    await tester.pumpWidget(const ProviderScope(child: RedouanePortfolioApp()));
 
     // Verify that the brand/logo text is displayed
-    expect(find.text('CHEB REDOUANE'), findsAtLeastNWidgets(1));
+    expect(find.text('ORCHESTRE REDOUANE'), findsAtLeastNWidgets(1));
   });
 }

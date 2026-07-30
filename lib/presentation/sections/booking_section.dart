@@ -315,6 +315,7 @@ class _BookingSectionState extends ConsumerState<BookingSection> {
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
+                        isExpanded: true,
                         initialValue: bookingState.eventType,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.event_seat_outlined, color: AppColors.gold, size: 20),
