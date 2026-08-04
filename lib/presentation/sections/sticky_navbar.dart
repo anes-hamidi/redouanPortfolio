@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/theme/responsive_breakpoints.dart';
 import '../../models/section_type.dart';
 import '../../providers/theme_provider.dart';
 import '../components/hover_builder.dart';
@@ -23,9 +24,12 @@ class StickyNavbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
     final isDark = themeMode == ThemeMode.dark;
+    final usesDrawer = ResponsiveBreakpoints.usesMobileDrawer(context);
+    final isTv = ResponsiveBreakpoints.isTv(context);
+    final horizPadding = ResponsiveBreakpoints.horizontalPadding(context);
 
     return Container(
-      height: 80,
+      height: isTv ? 90 : 80,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0D1424).withValues(alpha: 0.95) : AppColors.navy.withValues(alpha: 0.92),
         boxShadow: [
@@ -42,7 +46,7 @@ class StickyNavbar extends ConsumerWidget {
           ),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: horizPadding, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -60,7 +64,7 @@ class StickyNavbar extends ConsumerWidget {
                     style: TextStyle(
                       fontFamily: 'serif',
                       fontWeight: FontWeight.bold,
-                      fontSize: isMobile ? 18 : 22,
+                      fontSize: isTv ? 26 : (usesDrawer ? 18 : 22),
                       color: AppColors.gold,
                       letterSpacing: 2,
                     ),
@@ -69,7 +73,7 @@ class StickyNavbar extends ConsumerWidget {
                     AppStrings.brandSubtitle,
                     style: TextStyle(
                       fontFamily: 'sans-serif',
-                      fontSize: isMobile ? 9 : 11,
+                      fontSize: isTv ? 12 : (usesDrawer ? 9 : 11),
                       color: Colors.white.withValues(alpha: 0.7),
                       letterSpacing: 3,
                     ),
@@ -82,34 +86,21 @@ class StickyNavbar extends ConsumerWidget {
           // Navigation Menu Items & Theme Toggle
           Row(
             children: [
-              if (!isMobile) ...[
-                _buildNavItem(SectionType.home, AppStrings.navHome),
-                _buildNavItem(SectionType.about, AppStrings.navAbout),
-                _buildNavItem(SectionType.services, AppStrings.navServices),
-                _buildNavItem(SectionType.media, AppStrings.navMedia),
-                _buildNavItem(SectionType.whyChoose, AppStrings.navWhyChoose),
-                _buildNavItem(SectionType.contact, AppStrings.navContact),
+              if (!usesDrawer) ...[
+                _buildNavItem(context, SectionType.home, AppStrings.navHome),
+                _buildNavItem(context, SectionType.services, AppStrings.navServices),
+                _buildNavItem(context, SectionType.about, AppStrings.navAbout),
+                _buildNavItem(context, SectionType.media, AppStrings.navMedia),
+                _buildNavItem(context, SectionType.whyChoose, AppStrings.navWhyChoose),
                 const SizedBox(width: 16),
-                _buildBookCTAButton(),
+                _buildBookCTAButton(context),
                 const SizedBox(width: 16),
               ],
 
               // Theme Mode Switcher Icon
-              IconButton(
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Icon(
-                    isDark ? Icons.light_mode : Icons.dark_mode,
-                    key: ValueKey(isDark),
-                    color: AppColors.gold,
-                    size: 22,
-                  ),
-                ),
-                onPressed: () => ref.read(themeProvider.notifier).toggleTheme(),
-                tooltip: isDark ? 'Passer en Mode Clair' : 'Passer en Mode Nuit Andalouse',
-              ),
+      
 
-              if (isMobile)
+              if (usesDrawer)
                 Builder(
                   builder: (context) => IconButton(
                     icon: const Icon(Icons.menu, color: AppColors.gold, size: 28),
@@ -125,15 +116,19 @@ class StickyNavbar extends ConsumerWidget {
     );
   }
 
-  Widget _buildNavItem(SectionType section, String label) {
+  Widget _buildNavItem(BuildContext context, SectionType section, String label) {
     final isActive = activeSection == section;
+    final isTv = ResponsiveBreakpoints.isTv(context);
+    final fontSize = isTv ? 17.0 : 14.0;
+    final horizPadding = isTv ? 24.0 : 16.0;
+
     return HoverBuilder(
       cursor: SystemMouseCursors.click,
       builder: (context, isHovered) {
         return GestureDetector(
           onTap: () => onSectionSelect(section),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: horizPadding),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -145,14 +140,14 @@ class StickyNavbar extends ConsumerWidget {
                     color: isActive
                         ? AppColors.gold
                         : (isHovered ? AppColors.gold.withValues(alpha: 0.8) : Colors.white),
-                    fontSize: 14,
+                    fontSize: fontSize,
                   ),
                 ),
                 const SizedBox(height: 4),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  height: 2,
-                  width: isActive ? 24 : (isHovered ? 16 : 0),
+                  height: isTv ? 3 : 2,
+                  width: isActive ? (isTv ? 32 : 24) : (isHovered ? 16 : 0),
                   color: AppColors.gold,
                 ),
               ],
@@ -163,7 +158,8 @@ class StickyNavbar extends ConsumerWidget {
     );
   }
 
-  Widget _buildBookCTAButton() {
+  Widget _buildBookCTAButton(BuildContext context) {
+    final isTv = ResponsiveBreakpoints.isTv(context);
     return HoverBuilder(
       builder: (context, isHovered) {
         return OutlinedButton(
@@ -174,7 +170,7 @@ class StickyNavbar extends ConsumerWidget {
               width: isHovered ? 2 : 1.5,
             ),
             backgroundColor: isHovered ? AppColors.gold : Colors.transparent,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: isTv ? 28 : 20, vertical: isTv ? 20 : 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
             ),
@@ -185,7 +181,7 @@ class StickyNavbar extends ConsumerWidget {
               fontFamily: 'sans-serif',
               fontWeight: FontWeight.bold,
               color: isHovered ? AppColors.navy : AppColors.gold,
-              fontSize: 13,
+              fontSize: isTv ? 15 : 13,
               letterSpacing: 1,
             ),
           ),
@@ -253,11 +249,11 @@ class MobileDrawer extends ConsumerWidget {
               padding: EdgeInsets.zero,
               children: [
                 _buildDrawerItem(context, SectionType.home, Icons.home, AppStrings.navHome),
-                _buildDrawerItem(context, SectionType.about, Icons.person, AppStrings.navAbout),
+                _buildDrawerItem(context, SectionType.contact, Icons.event, AppStrings.navContact),
                 _buildDrawerItem(context, SectionType.services, Icons.star, AppStrings.navServices),
+                _buildDrawerItem(context, SectionType.about, Icons.person, AppStrings.navAbout),
                 _buildDrawerItem(context, SectionType.media, Icons.audiotrack, AppStrings.navMedia),
                 _buildDrawerItem(context, SectionType.whyChoose, Icons.check_circle, AppStrings.navWhyChoose),
-                _buildDrawerItem(context, SectionType.contact, Icons.event, AppStrings.navContact),
               ],
             ),
           ),

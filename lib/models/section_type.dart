@@ -1,2 +1,3 @@
 /// Navigation section identifiers
-enum SectionType { home, about, services, media, whyChoose, contact }
+enum SectionType { home, contact, services, about, media, whyChoose }
+

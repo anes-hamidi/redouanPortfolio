@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_data.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/theme/responsive_breakpoints.dart';
+import '../components/fade_in_slide.dart';
 import '../components/section_header.dart';
 
 /// Why Choose Section Component
@@ -17,44 +19,65 @@ class WhyChooseSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final horizPadding = ResponsiveBreakpoints.horizontalPadding(context);
+    final vertPadding = ResponsiveBreakpoints.verticalPadding(context);
+    final containerMaxWidth = ResponsiveBreakpoints.maxContainerWidth(context);
+    final isPhone = ResponsiveBreakpoints.isPhone(context);
+
     return Container(
       key: sectionKey,
       color: AppColors.navy,
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 100.0),
+      padding: EdgeInsets.symmetric(horizontal: horizPadding, vertical: vertPadding),
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: BoxConstraints(maxWidth: containerMaxWidth),
           child: Column(
             children: [
               // Section Header
-              const SectionHeader(
-                tagline: AppStrings.whyChooseTagline,
-                title: AppStrings.whyChooseTitle,
-                titleColor: Colors.white,
+              const FadeInSlide(
+                child: SectionHeader(
+                  tagline: AppStrings.whyChooseTagline,
+                  title: AppStrings.whyChooseTitle,
+                  titleColor: Colors.white,
+                ),
               ),
               const SizedBox(height: 64),
 
               // 3 Pillars Row / Column Layout
-              isMobile
+              isPhone
                   ? Column(
-                      children: AppData.pillars
-                          .map((pillar) => Padding(
-                                padding: const EdgeInsets.only(bottom: 48.0),
+                      children: AppData.pillars.asMap().entries
+                          .map((entry) {
+                            final index = entry.key;
+                            final pillar = entry.value;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 40.0),
+                              child: FadeInSlide(
+                                delay: Duration(milliseconds: index * 80),
                                 child: _buildPillarItem(pillar.icon, pillar.title, pillar.description),
-                              ))
+                              ),
+                            );
+                          })
                           .toList(),
                     )
                   : Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: AppData.pillars
+                      children: AppData.pillars.asMap().entries
                           .map(
-                            (pillar) => Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                child: _buildPillarItem(pillar.icon, pillar.title, pillar.description),
-                              ),
-                            ),
+                            (entry) {
+                              final index = entry.key;
+                              final pillar = entry.value;
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: FadeInSlide(
+                                    delay: Duration(milliseconds: index * 80),
+                                    child: _buildPillarItem(pillar.icon, pillar.title, pillar.description),
+                                  ),
+                                ),
+                              );
+                            },
                           )
                           .toList(),
                     ),

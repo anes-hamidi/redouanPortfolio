@@ -40,8 +40,8 @@ class FloatingWhatsappButton extends StatelessWidget {
       elevation: 6,
       icon: const Icon(Icons.chat, size: 22),
       label: const Text(
-        '',
-       
+        'Contactez-Nous',
+        style: TextStyle(fontSize: 14),
       ),
     );
   }

@@ -6,7 +6,6 @@ import '../../models/section_type.dart';
 
 import '../../providers/navigation_provider.dart';
 import '../../providers/theme_provider.dart';
-import '../components/floating_mini_player.dart';
 import '../components/floating_whatsapp_button.dart';
 
 import '../sections/sticky_navbar.dart';
@@ -17,6 +16,8 @@ import '../sections/media_section.dart';
 import '../sections/why_choose_section.dart';
 import '../sections/booking_section.dart';
 import '../sections/footer_section.dart';
+
+import '../../core/theme/responsive_breakpoints.dart';
 
 /// Main Single-Page Portfolio HomePage with Riverpod State & WhatsApp Integration
 class PortfolioHomePage extends ConsumerStatefulWidget {
@@ -31,6 +32,7 @@ class _PortfolioHomePageState extends ConsumerState<PortfolioHomePage> {
   final Map<SectionType, GlobalKey> _sectionKeys = {
     for (var type in SectionType.values) type: GlobalKey(),
   };
+  int _lastScrollCheck = 0;
 
   @override
   void initState() {
@@ -47,11 +49,15 @@ class _PortfolioHomePageState extends ConsumerState<PortfolioHomePage> {
   void _onScroll() {
     if (!_scrollController.hasClients) return;
 
+    final now = DateTime.now().millisecondsSinceEpoch;
     final navNotifier = ref.read(navigationProvider.notifier);
-    final navState = ref.read(navigationProvider);
-
     navNotifier.updateScrollInfo(scrollOffset: _scrollController.offset);
 
+    // Throttle heavy RenderObject localToGlobal calculations to at most once per 60ms for 60/120fps smooth scrolling
+    if (now - _lastScrollCheck < 60) return;
+    _lastScrollCheck = now;
+
+    final navState = ref.read(navigationProvider);
     SectionType detectedSection = SectionType.home;
     double minDiff = double.infinity;
 
@@ -80,8 +86,8 @@ class _PortfolioHomePageState extends ConsumerState<PortfolioHomePage> {
     if (key != null && key.currentContext != null) {
       Scrollable.ensureVisible(
         key.currentContext!,
-        duration: const Duration(milliseconds: 700),
-        curve: Curves.easeInOutCubic,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.fastOutSlowIn,
       );
     }
   }
@@ -89,7 +95,7 @@ class _PortfolioHomePageState extends ConsumerState<PortfolioHomePage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 950;
+    final usesDrawer = ResponsiveBreakpoints.usesMobileDrawer(context);
 
     final navState = ref.watch(navigationProvider);
     final isDark = ref.watch(themeProvider) == ThemeMode.dark;
@@ -97,7 +103,7 @@ class _PortfolioHomePageState extends ConsumerState<PortfolioHomePage> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF090D16) : AppColors.cream,
       floatingActionButton: const FloatingWhatsappButton(),
-      drawer: isMobile
+      drawer: usesDrawer
           ? MobileDrawer(
               activeSection: navState.activeSection,
               onSectionSelect: _scrollToSection,
@@ -109,38 +115,39 @@ class _PortfolioHomePageState extends ConsumerState<PortfolioHomePage> {
           SelectionArea(
             child: SingleChildScrollView(
               controller: _scrollController,
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               child: Column(
                 children: [
                   HeroSection(
                     sectionKey: _sectionKeys[SectionType.home]!,
                     size: size,
-                    isMobile: isMobile,
+                    isMobile: usesDrawer,
                     onBookTap: () => _scrollToSection(SectionType.contact),
                     onMediaTap: () => _scrollToSection(SectionType.media),
                   ),
-                  AboutSection(
-                    sectionKey: _sectionKeys[SectionType.about]!,
-                    isMobile: isMobile,
+                  BookingSection(
+                    sectionKey: _sectionKeys[SectionType.contact]!,
+                    isMobile: usesDrawer,
                   ),
                   ServicesSection(
                     sectionKey: _sectionKeys[SectionType.services]!,
-                    isMobile: isMobile,
+                    isMobile: usesDrawer,
+                  ),
+                  AboutSection(
+                    sectionKey: _sectionKeys[SectionType.about]!,
+                    isMobile: usesDrawer,
                   ),
                   MediaSection(
                     sectionKey: _sectionKeys[SectionType.media]!,
-                    isMobile: isMobile,
+                    isMobile: usesDrawer,
                   ),
                   WhyChooseSection(
                     sectionKey: _sectionKeys[SectionType.whyChoose]!,
-                    isMobile: isMobile,
-                  ),
-                  BookingSection(
-                    sectionKey: _sectionKeys[SectionType.contact]!,
-                    isMobile: isMobile,
+                    isMobile: usesDrawer,
                   ),
                   FooterSection(
                     sectionKey: GlobalKey(),
-                    isMobile: isMobile,
+                    isMobile: usesDrawer,
                   ),
                 ],
               ),
@@ -154,23 +161,13 @@ class _PortfolioHomePageState extends ConsumerState<PortfolioHomePage> {
             right: 0,
             child: StickyNavbar(
               activeSection: navState.activeSection,
-              isMobile: isMobile,
+              isMobile: usesDrawer,
               onSectionSelect: _scrollToSection,
             ),
           ),
 
           // Persistent Floating Mini-Player when scrolled
-          if (navState.showFloatingMiniPlayer)
-            Positioned(
-              bottom: 16,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: FloatingMiniPlayer(
-                  onTapExpand: () => _scrollToSection(SectionType.media),
-                ),
-              ),
-            ),
+          
         ],
       ),
     );

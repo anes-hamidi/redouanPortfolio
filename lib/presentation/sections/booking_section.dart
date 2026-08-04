@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/theme/responsive_breakpoints.dart';
 import '../../providers/booking_provider.dart';
+import '../components/fade_in_slide.dart';
 import '../components/section_header.dart';
 
 /// Booking & Contact Form Section Component with Riverpod & WhatsApp Integration
@@ -88,58 +90,82 @@ class _BookingSectionState extends ConsumerState<BookingSection> {
     }
   }
 
- 
-
- 
   @override
   Widget build(BuildContext context) {
     final bookingState = ref.watch(bookingProvider);
+    final horizPadding = ResponsiveBreakpoints.horizontalPadding(context);
+    final vertPadding = ResponsiveBreakpoints.verticalPadding(context);
+    final containerMaxWidth = ResponsiveBreakpoints.maxContainerWidth(context);
+    final isStacked = ResponsiveBreakpoints.isPhone(context) || ResponsiveBreakpoints.isTablet(context);
 
     return Container(
       key: widget.sectionKey,
       color: AppColors.cream,
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 100.0),
+      padding: EdgeInsets.symmetric(horizontal: horizPadding, vertical: vertPadding),
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: BoxConstraints(maxWidth: containerMaxWidth),
           child: Column(
             children: [
               // Section Header
-              const SectionHeader(
-                tagline: AppStrings.contactTagline,
-                title: AppStrings.contactTitle,
+              const FadeInSlide(
+                child: SectionHeader(
+                  tagline: AppStrings.contactTagline,
+                  title: AppStrings.contactTitle,
+                ),
               ),
               const SizedBox(height: 16),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 700),
-                child: const Text(
-                  AppStrings.contactSubtitle,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'sans-serif',
-                    fontSize: 16,
-                    color: AppColors.bodyText,
-                    height: 1.6,
+              FadeInSlide(
+                delay: const Duration(milliseconds: 80),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 700),
+                  child: const Text(
+                    AppStrings.contactSubtitle,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'sans-serif',
+                      fontSize: 16,
+                      color: AppColors.bodyText,
+                      height: 1.6,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 60),
 
               // Responsive Form & Contact Details Split
-              widget.isMobile
+              isStacked
                   ? Column(
                       children: [
-                        _buildContactCard(),
+                        FadeInSlide(
+                          delay: const Duration(milliseconds: 140),
+                          child: _buildContactCard(),
+                        ),
                         const SizedBox(height: 48),
-                        _buildBookingForm(bookingState),
+                        FadeInSlide(
+                          delay: const Duration(milliseconds: 220),
+                          child: _buildBookingForm(bookingState),
+                        ),
                       ],
                     )
                   : Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(flex: 5, child: _buildContactCard()),
+                        Expanded(
+                          flex: 5,
+                          child: FadeInSlide(
+                            delay: const Duration(milliseconds: 140),
+                            child: _buildContactCard(),
+                          ),
+                        ),
                         const SizedBox(width: 48),
-                        Expanded(flex: 7, child: _buildBookingForm(bookingState)),
+                        Expanded(
+                          flex: 7,
+                          child: FadeInSlide(
+                            delay: const Duration(milliseconds: 220),
+                            child: _buildBookingForm(bookingState),
+                          ),
+                        ),
                       ],
                     ),
             ],
@@ -182,15 +208,13 @@ class _BookingSectionState extends ConsumerState<BookingSection> {
           const SizedBox(height: 20),
           _buildContactInfoRow(Icons.email, AppStrings.contactEmail),
           const SizedBox(height: 20),
-          _buildContactInfoRow(Icons.location_on, AppStrings.contactLocation),
-          const SizedBox(height: 36),
 
           // Direct WhatsApp Button in Contact Card
           ElevatedButton.icon(
             onPressed: () => ref.read(bookingProvider.notifier).sendWhatsAppReservation(),
             icon: const Icon(Icons.chat, color: Colors.white, size: 20),
             label: const Text(
-              'Discuter sur WhatsApp (${AppStrings.whatsappDisplayPhone})',
+              'Discuter sur WhatsApp)',
               style: TextStyle(
                 fontFamily: 'sans-serif',
                 fontWeight: FontWeight.bold,
@@ -254,161 +278,180 @@ class _BookingSectionState extends ConsumerState<BookingSection> {
     final bookingNotifier = ref.read(bookingProvider.notifier);
     final isSubmitting = bookingState.status == BookingFormStatus.submitting;
 
-    return Container(
-      padding: const EdgeInsets.all(36),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.3), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompactForm = constraints.maxWidth < 520;
+        final formPadding = isCompactForm ? 20.0 : 36.0;
+
+        final nameField = _buildTextField(
+          controller: _nameController,
+          label: AppStrings.labelFullName,
+          icon: Icons.person_outline,
+          validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
+        );
+
+        final phoneField = _buildTextField(
+          controller: _phoneController,
+          label: AppStrings.labelPhone,
+          icon: Icons.phone_outlined,
+          validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
+        );
+
+        final eventTypeField = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Name & Phone Row
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: _nameController,
-                    label: AppStrings.labelFullName,
-                    icon: Icons.person_outline,
-                    validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildTextField(
-                    controller: _phoneController,
-                    label: AppStrings.labelPhone,
-                    icon: Icons.phone_outlined,
-                    validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
-                  ),
-                ),
-              ],
+            const Text(
+              AppStrings.labelEventType,
+              style: TextStyle(
+                fontFamily: 'sans-serif',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.navy,
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              initialValue: bookingState.eventType,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.event_seat_outlined, color: AppColors.gold, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(4),
+                  borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.3)),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.gold, width: 1.5),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              items: _eventTypes
+                  .map((type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(type, style: const TextStyle(fontSize: 14)),
+                      ))
+                  .toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  bookingNotifier.setEventType(val);
+                }
+              },
+            ),
+          ],
+        );
 
-            // Event Type Dropdown & Date Row
-            Row(
+        final dateField = GestureDetector(
+          onTap: () => _selectDate(context),
+          child: AbsorbPointer(
+            child: _buildTextField(
+              controller: _dateController,
+              label: AppStrings.labelEventDate,
+              icon: Icons.calendar_today_outlined,
+              hint: 'Sélectionner la date',
+              validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
+            ),
+          ),
+        );
+
+        return Container(
+          padding: EdgeInsets.all(formPadding),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.3), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                // Name & Phone Row or Column
+                if (isCompactForm) ...[
+                  nameField,
+                  const SizedBox(height: 20),
+                  phoneField,
+                ] else ...[
+                  Row(
                     children: [
-                      const Text(
-                        AppStrings.labelEventType,
-                        style: TextStyle(
-                          fontFamily: 'sans-serif',
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.navy,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        isExpanded: true,
-                        initialValue: bookingState.eventType,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.event_seat_outlined, color: AppColors.gold, size: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(4),
-                            borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.3)),
-                          ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: AppColors.gold, width: 1.5),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                        ),
-                        items: _eventTypes
-                            .map((type) => DropdownMenuItem(
-                                  value: type,
-                                  child: Text(type, style: const TextStyle(fontSize: 14)),
-                                ))
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            bookingNotifier.setEventType(val);
-                          }
-                        },
-                      ),
+                      Expanded(child: nameField),
+                      const SizedBox(width: 16),
+                      Expanded(child: phoneField),
                     ],
                   ),
+                ],
+                const SizedBox(height: 20),
+
+                // Event Type Dropdown & Date Row or Column
+                if (isCompactForm) ...[
+                  eventTypeField,
+                  const SizedBox(height: 20),
+                  dateField,
+                ] else ...[
+                  Row(
+                    children: [
+                      Expanded(child: eventTypeField),
+                      const SizedBox(width: 16),
+                      Expanded(child: dateField),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 20),
+
+                // City
+                _buildTextField(
+                  controller: _cityController,
+                  label: AppStrings.labelCity,
+                  icon: Icons.location_city_outlined,
+                  validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _selectDate(context),
-                    child: AbsorbPointer(
-                      child: _buildTextField(
-                        controller: _dateController,
-                        label: AppStrings.labelEventDate,
-                        icon: Icons.calendar_today_outlined,
-                        hint: 'Sélectionner la date',
-                        validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
+                const SizedBox(height: 20),
+
+                // Message
+                _buildTextField(
+                  controller: _messageController,
+                  label: AppStrings.labelMessage,
+                  icon: Icons.chat_bubble_outline,
+                  maxLines: 4,
+                ),
+                const SizedBox(height: 32),
+
+                // Primary WhatsApp Reservation Action Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: isSubmitting ? null : _submitWhatsApp,
+                    icon: const Icon(Icons.chat, color: Colors.white, size: 22),
+                    label: const Text(
+                      'Réserver Instantanément via WhatsApp',
+                      style: TextStyle(
+                        fontFamily: 'sans-serif',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
                       ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25D366),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      elevation: 3,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-
-            // City
-            _buildTextField(
-              controller: _cityController,
-              label: AppStrings.labelCity,
-              icon: Icons.location_city_outlined,
-              validator: (val) => val == null || val.isEmpty ? 'Champ requis' : null,
-            ),
-            const SizedBox(height: 20),
-
-            // Message
-            _buildTextField(
-              controller: _messageController,
-              label: AppStrings.labelMessage,
-              icon: Icons.chat_bubble_outline,
-              maxLines: 4,
-            ),
-            const SizedBox(height: 32),
-
-            // Primary WhatsApp Reservation Action Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: isSubmitting ? null : _submitWhatsApp,
-                icon: const Icon(Icons.chat, color: Colors.white, size: 22),
-                label: const Text(
-                  'Réserver Instantanément via WhatsApp',
-                  style: TextStyle(
-                    fontFamily: 'sans-serif',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: Colors.white,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF25D366),
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  elevation: 3,
-                ),
-              ),
-            ),
-         ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

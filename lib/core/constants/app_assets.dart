@@ -1,8 +1,8 @@
 /// Asset path constants for images and audio tracks
 abstract class AppAssets {
   // Images
-  static const String heroPerformance = 'assets/images/hero_performance.png';
-  static const String redouanePortrait = 'assets/images/redouane_portrait.png';
+  static const String heroPerformance = 'assets/images/hero_performance.jpeg';
+  static const String redouanePortrait = 'assets/images/redouane_portrait.jpg';
   static const String weddingPerformance = 'assets/images/wedding_performance.png';
   static const String tlemcenHeritage = 'assets/images/tlemcen_heritage.png';
 

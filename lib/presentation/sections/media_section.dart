@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/theme/responsive_breakpoints.dart';
 import '../components/audio_player_widget.dart';
+import '../components/fade_in_slide.dart';
 import '../components/hover_builder.dart';
 import '../components/section_header.dart';
 
@@ -19,29 +21,42 @@ class MediaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final horizPadding = ResponsiveBreakpoints.horizontalPadding(context);
+    final vertPadding = ResponsiveBreakpoints.verticalPadding(context);
+    final containerMaxWidth = ResponsiveBreakpoints.maxContainerWidth(context);
+    final isStacked = ResponsiveBreakpoints.isPhone(context) || ResponsiveBreakpoints.isTablet(context);
+
     return Container(
       key: sectionKey,
       color: AppColors.cream,
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 100.0),
+      padding: EdgeInsets.symmetric(horizontal: horizPadding, vertical: vertPadding),
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: BoxConstraints(maxWidth: containerMaxWidth),
           child: Column(
             children: [
               // Section Header
-              const SectionHeader(
-                tagline: AppStrings.mediaTagline,
-                title: AppStrings.mediaTitle,
+              const FadeInSlide(
+                child: SectionHeader(
+                  tagline: AppStrings.mediaTagline,
+                  title: AppStrings.mediaTitle,
+                ),
               ),
               const SizedBox(height: 60),
 
               // Responsive Layout Split: Player & Photos
-              isMobile
+              isStacked
                   ? Column(
                       children: [
-                        const AudioPlayerWidget(),
-                        const SizedBox(height: 64),
-                        _buildPhotoGallery(),
+                        const FadeInSlide(
+                          delay: Duration(milliseconds: 100),
+                          child: AudioPlayerWidget(),
+                        ),
+                        const SizedBox(height: 48),
+                        FadeInSlide(
+                          delay: const Duration(milliseconds: 200),
+                          child: _buildPhotoGallery(),
+                        ),
                       ],
                     )
                   : Row(
@@ -49,12 +64,18 @@ class MediaSection extends StatelessWidget {
                       children: [
                         const Expanded(
                           flex: 5,
-                          child: AudioPlayerWidget(),
+                          child: FadeInSlide(
+                            delay: Duration(milliseconds: 100),
+                            child: AudioPlayerWidget(),
+                          ),
                         ),
                         const SizedBox(width: 48),
                         Expanded(
                           flex: 6,
-                          child: _buildPhotoGallery(),
+                          child: FadeInSlide(
+                            delay: const Duration(milliseconds: 200),
+                            child: _buildPhotoGallery(),
+                          ),
                         ),
                       ],
                     ),
@@ -94,14 +115,33 @@ class MediaSection extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             double sizeVal = (constraints.maxWidth - 16) / 2;
+            if (constraints.maxWidth < 360) {
+              sizeVal = constraints.maxWidth;
+            }
             return Wrap(
               spacing: 16,
               runSpacing: 16,
               children: [
-                _buildGalleryImage('Mariage Célébration', AppAssets.weddingPerformance, sizeVal),
-                _buildGalleryImage('Tradition Tlemcen', AppAssets.tlemcenHeritage, sizeVal),
-                _buildGalleryImage('Concert sur Scène', AppAssets.heroPerformance, sizeVal),
-                _buildGalleryImage('Portrait Privé', AppAssets.redouanePortrait, sizeVal),
+                _buildGalleryImage(
+                  'Concert sur Scène',
+                  AppAssets.heroPerformance,
+                  sizeVal,
+                ),
+                _buildGalleryImage(
+                  'Portrait Privé',
+                  AppAssets.redouanePortrait,
+                  sizeVal,
+                ),
+                _buildGalleryImage(
+                  'Mariage Célébration',
+                  AppAssets.weddingPerformance,
+                  sizeVal,
+                ),
+                _buildGalleryImage(
+                  'Tradition Tlemcen',
+                  AppAssets.tlemcenHeritage,
+                  sizeVal,
+                ),
               ],
             );
           },
@@ -133,7 +173,11 @@ class MediaSection extends StatelessWidget {
                     return Container(
                       color: AppColors.darkCharcoal,
                       child: const Center(
-                        child: Icon(Icons.image, color: AppColors.gold, size: 40),
+                        child: Icon(
+                          Icons.image,
+                          color: AppColors.gold,
+                          size: 40,
+                        ),
                       ),
                     );
                   },
@@ -143,13 +187,19 @@ class MediaSection extends StatelessWidget {
               Positioned.fill(
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  color: isHovered ? AppColors.navy.withValues(alpha: 0.85) : Colors.transparent,
+                  color: isHovered
+                      ? AppColors.navy.withValues(alpha: 0.85)
+                      : Colors.transparent,
                   child: isHovered
                       ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.zoom_in, color: AppColors.gold, size: 32),
+                              const Icon(
+                                Icons.zoom_in,
+                                color: AppColors.gold,
+                                size: 32,
+                              ),
                               const SizedBox(height: 8),
                               Text(
                                 label,

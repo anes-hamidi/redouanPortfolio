@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_data.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/theme/responsive_breakpoints.dart';
+import '../components/fade_in_slide.dart';
 import '../components/hover_builder.dart';
 import '../components/section_header.dart';
 
@@ -18,60 +20,65 @@ class ServicesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double paddingVal = isMobile ? 24.0 : 64.0;
+    final horizPadding = ResponsiveBreakpoints.horizontalPadding(context);
+    final vertPadding = ResponsiveBreakpoints.verticalPadding(context);
+    final containerMaxWidth = ResponsiveBreakpoints.maxContainerWidth(context);
+
     return Container(
       key: sectionKey,
       color: AppColors.darkCharcoal,
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: paddingVal, vertical: 100.0),
+      padding: EdgeInsets.symmetric(horizontal: horizPadding, vertical: vertPadding),
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: BoxConstraints(maxWidth: containerMaxWidth),
           child: Column(
             children: [
               // Section Header
-              const SectionHeader(
-                tagline: AppStrings.servicesTagline,
-                title: AppStrings.servicesTitle,
-                titleColor: Colors.white,
+              const FadeInSlide(
+                child: SectionHeader(
+                  tagline: AppStrings.servicesTagline,
+                  title: AppStrings.servicesTitle,
+                  titleColor: Colors.white,
+                ),
               ),
               const SizedBox(height: 64),
 
-              // Grid of Interactive Service Cards
-              isMobile
-                  ? Column(
-                      children: AppData.services
-                          .map((service) => Padding(
-                                padding: const EdgeInsets.only(bottom: 24.0),
-                                child: _buildServiceCard(
-                                  service.icon,
-                                  service.title,
-                                  service.description,
-                                ),
-                              ))
-                          .toList(),
-                    )
-                  : LayoutBuilder(
-                      builder: (context, constraints) {
-                        double cardWidth = (constraints.maxWidth - 24) / 2;
-                        return Wrap(
-                          spacing: 24,
-                          runSpacing: 24,
-                          children: AppData.services
-                              .map(
-                                (service) => SizedBox(
-                                  width: cardWidth,
-                                  child: _buildServiceCard(
-                                    service.icon,
-                                    service.title,
-                                    service.description,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        );
-                      },
-                    ),
+              // Grid of Interactive Service Cards (1 col phone, 2 col tablet/desktop, 4 col TV)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  int columns = 2;
+                  if (constraints.maxWidth < 650) {
+                    columns = 1;
+                  } else if (constraints.maxWidth >= 1350) {
+                    columns = 4;
+                  } else {
+                    columns = 2;
+                  }
+                  final double spacing = 24.0;
+                  final double cardWidth = (constraints.maxWidth - (columns - 1) * spacing) / columns;
+
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: AppData.services.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final service = entry.value;
+                      return SizedBox(
+                        width: cardWidth,
+                        child: FadeInSlide(
+                          delay: Duration(milliseconds: index * 70),
+                          child: _buildServiceCard(
+                            service.icon,
+                            service.title,
+                            service.description,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
             ],
           ),
         ),

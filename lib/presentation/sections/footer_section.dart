@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio/core/theme/responsive_breakpoints.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../components/hover_builder.dart';
@@ -18,6 +19,8 @@ class FooterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  final usesDrawer = ResponsiveBreakpoints.usesMobileDrawer(context);
+
     return Container(
       key: sectionKey,
       color: AppColors.navy,
@@ -55,9 +58,20 @@ class FooterSection extends StatelessWidget {
                           letterSpacing: 2,
                         ),
                       ),
+                      if (usesDrawer)
+                      Row(
+                        children: [
+                      _buildSocialIconButton(Icons.music_note, 'TikTok'),
+                      const SizedBox(width: 12),
+                      _buildSocialIconButton(Icons.camera_alt, 'Instagram'),
+                      const SizedBox(width: 12),
+                      _buildSocialIconButton(Icons.video_library, 'YouTube'),
+                    
+                        ],
+                      ),
                     ],
                   ),
-
+                 if (!usesDrawer)
                   // Social Icons
                   Row(
                     children: [

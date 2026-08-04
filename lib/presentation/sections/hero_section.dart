@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/theme/responsive_breakpoints.dart';
+import '../components/fade_in_slide.dart';
 
 /// Hero Section Component
 class HeroSection extends StatelessWidget {
@@ -22,9 +24,35 @@ class HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final headlineFontSize = ResponsiveBreakpoints.value<double>(
+      context,
+      phone: 28,
+      tablet: 40,
+      desktop: 54,
+      tv: 68,
+    );
+    final subtitleFontSize = ResponsiveBreakpoints.value<double>(
+      context,
+      phone: 14,
+      tablet: 17,
+      desktop: 19,
+      tv: 23,
+    );
+    final taglineFontSize = ResponsiveBreakpoints.value<double>(
+      context,
+      phone: 10,
+      tablet: 11,
+      desktop: 12,
+      tv: 14,
+    );
+    final containerMaxWidth = ResponsiveBreakpoints.maxContainerWidth(context);
+
+    // Flexible minimum height to avoid mobile overflow on landscape/short screens
+    final minHeroHeight = size.height > 560 ? size.height : 560.0;
+
+    return Container(
       key: sectionKey,
-      height: size.height,
+      constraints: BoxConstraints(minHeight: minHeroHeight),
       width: double.infinity,
       child: Stack(
         children: [
@@ -73,68 +101,82 @@ class HeroSection extends StatelessWidget {
           // Hero Content
           Center(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 1000),
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              constraints: BoxConstraints(maxWidth: containerMaxWidth),
+              padding: EdgeInsets.symmetric(
+                horizontal: ResponsiveBreakpoints.horizontalPadding(context),
+                vertical: 40.0,
+              ),
               margin: const EdgeInsets.only(top: 80),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Golden Tagline Pill
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.gold, width: 1.5),
-                      borderRadius: BorderRadius.circular(20),
-                      color: AppColors.gold.withValues(alpha: 0.1),
-                    ),
-                    child: const Text(
-                      AppStrings.heroTagline,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'sans-serif',
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        letterSpacing: 2.5,
+                  FadeInSlide(
+                    delay: Duration.zero,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.gold, width: 1.5),
+                        borderRadius: BorderRadius.circular(20),
+                        color: AppColors.gold.withValues(alpha: 0.1),
+                      ),
+                      child: Text(
+                        AppStrings.heroTagline,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'sans-serif',
+                          color: AppColors.gold,
+                          fontWeight: FontWeight.bold,
+                          fontSize: taglineFontSize,
+                          letterSpacing: 2.5,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // Main Headline
-                  Text(
-                    AppStrings.heroHeadline,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'serif',
-                      color: Colors.white,
-                      fontSize: isMobile ? 32 : 54,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
+                  FadeInSlide(
+                    delay: const Duration(milliseconds: 100),
+                    child: Text(
+                      AppStrings.heroHeadline,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'serif',
+                        color: Colors.white,
+                        fontSize: headlineFontSize,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   // Subtitle
-                  Text(
-                    AppStrings.heroSubtitle,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'sans-serif',
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: isMobile ? 15 : 19,
-                      height: 1.6,
-                      fontWeight: FontWeight.w300,
+                  FadeInSlide(
+                    delay: const Duration(milliseconds: 180),
+                    child: Text(
+                      AppStrings.heroSubtitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'sans-serif',
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: subtitleFontSize,
+                        height: 1.6,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 40),
 
                   // Dual CTA Buttons
-                  Wrap(
-                    spacing: 20,
-                    runSpacing: 16,
-                    alignment: WrapAlignment.center,
+                  FadeInSlide(
+                    delay: const Duration(milliseconds: 260),
+                    child: Wrap(
+                      spacing: 20,
+                      runSpacing: 16,
+                      alignment: WrapAlignment.center,
                     children: [
                       // Primary CTA
                       ElevatedButton(
@@ -195,6 +237,7 @@ class HeroSection extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
                 ],
               ),
             ),

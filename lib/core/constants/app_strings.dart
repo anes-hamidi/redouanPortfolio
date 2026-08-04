@@ -10,13 +10,13 @@ abstract class AppStrings {
   static const String navHome = 'Accueil';
   static const String navAbout = 'À Propos';
   static const String navServices = 'Prestations';
-  static const String navMedia = 'Musique & Galerie';
+  static const String navMedia = 'Musique';
   static const String navWhyChoose = 'Engagements';
   static const String navContact = 'Contact';
-  static const String navBookCTA = 'Réserver un Événement';
+  static const String navBookCTA = 'Réserver';
 
   // Hero Section
-  static const String heroTagline = 'HÉRITAGE MUSICAL & HAWZI DE TLEMCEN';
+  static const String heroTagline = 'HÉRITAGE MUSICAL & Algerien';
   static const String heroHeadline = 'Vivez la Magie de la Musique Algérienne Authentique';
   static const String heroSubtitle =
       'Mariages, Anniversaires, Événements Privés & Concerts Publics avec Orchestre Redouane. Une musique élégante, festive et 100% respectueuse des traditions familiales.';
@@ -39,7 +39,7 @@ abstract class AppStrings {
   // Media Showcase Section
   static const String mediaTagline = 'Showcase Média';
   static const String mediaTitle = 'Galerie & Écoute de Démos';
-  static const String playerHeader = 'LECTEUR AUDIO DÉMO';
+  static const String playerHeader = 'LECTEUR';
   static const String galleryTitle = 'PHOTOS DE PRESTATIONS';
   static const String gallerySubtitle =
       'Aperçu de nos prestations en direct lors des plus prestigieuses cérémonies.';
